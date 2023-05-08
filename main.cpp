@@ -1,10 +1,12 @@
 #include <iostream>
 #include "deltaStepping.cpp"
 
+using namespace std;
+
 void displayRes(int *res, int N){
-	std::cout << "Result:" << std::endl;
+	cout << "Result:" << endl;
 	for(size_t i = 0; i < N; ++i){
-		std::cout << "index-" << i << " " << res[i] << " " << std::endl;
+		cout << "Node " << i << " with SP " << res[i] << " " << endl;
 	}
 }
 
@@ -21,7 +23,7 @@ void displayRes(int *res, int N){
  result should be:
  0 2 3 8 6 9
 */
-std::pair<int**,int> graph_1(){
+pair<int**, int> graph_1(){
 	const int N = 6;
 	int** adjMat = new int*[N];
 	for(size_t i = 0; i < N; ++i){
@@ -38,14 +40,40 @@ std::pair<int**,int> graph_1(){
 	adjMat[3][5] = 1;
 	adjMat[4][3] = 2;
 	adjMat[4][5] = 5;
-	return std::make_pair(adjMat, N);
+	return make_pair(adjMat, N);
+}
+
+/*
+Helper functions for parsing graphs
+*/
+pair<int, int> smallestAndLongestEdges(int** adjMat, int N){
+	int min = INT_MAX;
+	int max = INT_MIN;
+	for(size_t i = 0; i < N; ++i){
+		for(size_t j = 0; j < N; ++j){
+			if (adjMat[i][j] > max) {
+                max = adjMat[i][j];
+            }
+			if (adjMat[i][j] < min && adjMat[i][j] > 0) {
+				min = adjMat[i][j];
+			}
+		}
+	}
+	return make_pair(min, max);
 }
 
 int main(int argc, char* argv[]){
-	std::pair<int**,int> graph = graph_1();
+	pair<int**,int> graph = graph_1();
+	int** adjMat = graph.first;
 	int N = graph.second;
 	int res[N];
-	seqDeltaStepping(graph.first, 0, res, N);
+	pair<int, int> p = smallestAndLongestEdges(adjMat, N);
+	int DELTA = p.first;
+	int L = p.second;
+	if (argc == 2) {
+        DELTA = stoi(argv[1]);
+    }
+	seqDeltaStepping(adjMat, 0, res, N, L, DELTA);
 	displayRes(res,N);
     return 0;
 }
