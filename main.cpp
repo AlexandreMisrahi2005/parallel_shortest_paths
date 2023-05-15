@@ -11,7 +11,7 @@ void displayRes(int *res, int N){
 }
 
 /*
-5est graph from Abdul Bari (youtube)
+Test graph from Abdul Bari (youtube)
 {{0,2,4,0,0,0},
  {0,0,1,7,0,0},
  {0,0,0,0,3,0},
@@ -69,11 +69,17 @@ int main(int argc, char* argv[]){
 	int res[N];
 	pair<int, int> p = smallestAndLongestEdges(adjMat, N);
 	int DELTA = p.first;
-	int L = p.second;
 	if (argc == 2) {
         DELTA = stoi(argv[1]);
     }
-	seqDeltaStepping(adjMat, 0, res, N, L, DELTA);
+	int b = 1 + ceil(p.second/DELTA);
+	seqDeltaStepping(adjMat,   // adjacency matrix
+					 0,        // soucre node
+					 res,      // result array (size N)
+					 N,        // number of nodes
+					 b,        // b as in the original paper
+					 DELTA     // bucket width as in the original paper
+					);
 	displayRes(res,N);
     return 0;
 }
