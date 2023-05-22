@@ -74,7 +74,7 @@ int main(int argc, char* argv[]){
     }
 	int b = 1 + ceil(p.second/DELTA);
 	seqDeltaStepping(adjMat,   // adjacency matrix
-					 0,        // soucre node
+					 0,        // source node
 					 res,      // result array (size N)
 					 N,        // number of nodes
 					 b,        // b as in the original paper
