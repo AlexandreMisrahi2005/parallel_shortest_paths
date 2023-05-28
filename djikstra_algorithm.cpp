@@ -127,6 +127,11 @@ int main() {
     // Find the shortest paths from vertex 0
     vector<int> dist = dijkstra(g, 0);
 
+    // Print the shortest paths
+    cout << "Vertex\tDistance from Source\n";
+    for (int i = 0; i < g.size(); ++i) {
+        cout << i << "\t" << dist[i] << "\n";
+    }
     // End the timer
     auto end = std::chrono::high_resolution_clock::now();
 
@@ -135,9 +140,6 @@ int main() {
 
     // Print the time taken
     std::cout << "Operation took " << duration << " microseconds." << std::endl;
-
-    // Print vector of shortest paths from source to vertex 11
-    std::cout << "Shortest paths from source 0 to vertex 11: " << dist[11] << std::endl;
 
     return 0;
 }
