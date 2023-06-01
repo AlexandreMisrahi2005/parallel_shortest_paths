@@ -1,8 +1,8 @@
 #include <chrono>
 #include <cmath>
 
-#include "deltastep_algorithm.cpp"
-#include "djikstra_algorithm.cpp"
+#include "deltastepping.cpp"
+#include "dijkstra.cpp"
 
 pii smallestAndLongestEdges(vector< vector<pii> > adjMat, int N){
 	int min = INF;
@@ -22,13 +22,19 @@ pii smallestAndLongestEdges(vector< vector<pii> > adjMat, int N){
 }
 
 int main(int argc, char* argv[]) {
-    // USING DELTA STEP OR DIJKSTRA?
-    bool delta_step = true;
 
-    // Test graph from Abdul Bari (youtube)
-    // with source node 0
-    // result should be:
-    // 0 2 3 8 6 9
+    if (argc < 2) {
+        std::cout << "Usage: " << argv[0] << " <algorithm to use: [dijkstra, deltastepping]> " << " <optional: delta for deltastepping algorithm: [integer]> " << std::endl;
+        return 1;
+    }
+
+    /*
+    Test graph from Abdul Bari (youtube)
+    with source node 0
+    result should be:
+    0 2 3 8 6 9
+    */
+
     // Graph g(6);
 
     // g.add_edge(0, 1, 2);
@@ -40,13 +46,14 @@ int main(int argc, char* argv[]) {
     // g.add_edge(4, 5, 5);
     // g.add_edge(4, 3, 2);
 
-    // Test Graph
-    // with source node 0
-    // result should be:
-    // 0 6 4 3 11 10 5 7 14 18 11 10 8 10 18
-    Graph g(15); // create a graph with 15 vertices
+    /*
+    Test Graph
+    with source node 0
+    result should be:
+    0 6 4 3 11 10 5 7 14 18 11 10 8 10 18
+    */
 
-    // // add edges to the graph
+    Graph g(15);
     g.add_edge(0, 1, 6);
     g.add_edge(0, 2, 4);
     g.add_edge(0, 3, 3);
@@ -93,28 +100,30 @@ int main(int argc, char* argv[]) {
     g.add_edge(14, 13, 8);
 
 
-    // Start the timer
-    auto start = std::chrono::high_resolution_clock::now();
-
     vector<int> dist;
 
     // Find the shortest paths from vertex 0
-    if (delta_step) {
-        std::cout << "here1" << std::endl; 
+    std::string algo = argv[1];
+    if (algo == "deltastepping") {
         vector< vector<pii> > adjMat = g.get_adj_list();
-
         pii p = smallestAndLongestEdges(adjMat, g.size());
-        std::cout << "here2" << std::endl; 
         int DELTA = p.first;
-        if (argc == 2) {
-            DELTA = stoi(argv[1]);
+        if (argc == 3) {
+            DELTA = stoi(argv[2]);
         }
-        std::cout << "here3" << std::endl; 
         int b = 1 + std::ceil(p.second/DELTA);
-        std::cout << "b=" << b << "DELTA=" << DELTA << std::endl; 
-        dist = seqDeltaStepping(g, 0, DELTA, b);
-        std::cout << "here5" << std::endl;
-    } else {
+
+        // Start the timer
+        auto start = std::chrono::high_resolution_clock::now();
+
+        dist = seqDeltaStepping(g, 0, DELTA, b);  // graph, source node, delta, b (number of buckets)
+        
+        // End the timer
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+        std::cout << "Operation took " << duration << " µs." << std::endl;
+    } 
+    else if (algo == "dijkstra") {
         dist = dijkstra(g, 0);
     }
 
@@ -123,15 +132,6 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < g.size(); ++i) {
         cout << i << "\t" << dist[i] << "\n";
     }
-
-    // End the timer
-    auto end = std::chrono::high_resolution_clock::now();
-
-    // Calculate the duration
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-
-    // Print the time taken
-    std::cout << "Operation took " << duration << " microseconds." << std::endl;
 
     return 0;
 }
