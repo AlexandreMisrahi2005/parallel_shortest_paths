@@ -11,8 +11,8 @@ int N;                                      // number of vertices
 
 
 bool isNotEmpty(std::vector<std::priority_queue<int> > bucket_vec){
-    for(size_t i = 0; i < bucket_vec.size(); ++i){
-        if(!bucket_vec[i].empty()){
+    for (size_t i = 0; i < bucket_vec.size(); ++i) {
+        if (!bucket_vec[i].empty()) {
             return true;
         }
     }
@@ -20,7 +20,7 @@ bool isNotEmpty(std::vector<std::priority_queue<int> > bucket_vec){
 }
 
 void relax(int w, int x, std::vector<int> &tent, std::vector< std::priority_queue<int> > &B){
-    if(x < tent[w]){
+    if (x < tent[w]) {
         if(tent[w] != INF){
 
             B[(tent[w]/DELTA)%b].pop();   // remove from old bucket
@@ -70,7 +70,7 @@ std::vector<int> seqDeltaStepping(const Graph& graph, int source, int _DELTA, in
     std::vector<int> tent(N); // tentative distances
     std::vector< std::vector<Pii> > adj_list = graph.get_adj_list();
 
-    for(int i = 0; i < N; ++i){
+    for (int i = 0; i < N; ++i) {
         tent[i] = INF;
     }
 
