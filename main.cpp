@@ -4,7 +4,7 @@
 #include "deltastepping.cpp"
 #include "dijkstra.cpp"
 
-pii smallestAndLongestEdges(std::vector<std::vector<pii> > adjMat, int N){
+Pii smallestAndLongestEdges(std::vector<std::vector<Pii> > adjMat, int N){
 	int min = INF;
 	int max = -INF;
 	for (size_t i = 0; i < N; ++i) {
@@ -105,8 +105,8 @@ int main(int argc, char* argv[]) {
     // Find the shortest paths from vertex 0
     std::string algo = argv[1];
     if (algo == "deltastepping") {
-        std::vector<std::vector<pii>> adjMat = g.get_adj_list();
-        pii p = smallestAndLongestEdges(adjMat, g.size());
+        std::vector<std::vector<Pii>> adjMat = g.get_adj_list();
+        Pii p = smallestAndLongestEdges(adjMat, g.size());
         int DELTA = p.first;
         if (argc == 3) {
             DELTA = std::stoi(argv[2]);

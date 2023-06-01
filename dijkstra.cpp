@@ -12,8 +12,8 @@ std::vector<int> dijkstra(const Graph& graph, int source) {
 
     std::vector<int> dist(n, std::numeric_limits<int>::max());
     std::vector<bool> visited(n, false);
-    std::vector<std::vector<pii> > adj_list = graph.get_adj_list();
-    std::queue<pii> Q; // Queue of vertices
+    std::vector<std::vector<Pii> > adj_list = graph.get_adj_list();
+    std::queue<Pii> Q; // Queue of vertices
 
     Q.push(std::make_pair(0, source));
     dist[source] = 0;

@@ -4,11 +4,11 @@
 #include <vector>
 #include <iostream>
 
-typedef std::pair<int, int> pii; // (vertex, weight)
+typedef std::pair<int, int> Pii; // (vertex, weight)
 
 class Graph {
     int vertices; // number of vertices
-    std::vector<std::vector<pii>> adj_list; // adjacency list
+    std::vector<std::vector<Pii>> adj_list; // adjacency list
 
 public:
     Graph(int n) : vertices(n) {
@@ -24,7 +24,7 @@ public:
     int size() const {
         return vertices;
     }
-    std::vector<std::vector<pii>> get_adj_list() const {
+    std::vector<std::vector<Pii>> get_adj_list() const {
         return adj_list;
     }
 };

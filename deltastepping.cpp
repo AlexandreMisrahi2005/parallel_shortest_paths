@@ -30,8 +30,8 @@ void relax(int w, int x, std::vector<int> &tent, std::vector< std::priority_queu
     }
 }
 
-std::vector<pii> findRequests(std::priority_queue<int> bucket, bool light_edge, std::vector<std::vector<pii> > adj_list, std::vector<int> tent){
-    std::vector<pii> requests;
+std::vector<Pii> findRequests(std::priority_queue<int> bucket, bool light_edge, std::vector<std::vector<Pii> > adj_list, std::vector<int> tent){
+    std::vector<Pii> requests;
 
     while (!bucket.empty()) {
         int i = bucket.top();
@@ -49,7 +49,7 @@ std::vector<pii> findRequests(std::priority_queue<int> bucket, bool light_edge, 
     return requests;
 }
 
-void relaxRequests(std::vector<pii> requests, std::vector<int> &tent, std::vector<std::priority_queue<int> > &B){
+void relaxRequests(std::vector<Pii> requests, std::vector<int> &tent, std::vector<std::priority_queue<int> > &B){
     for(int i = 0; i < requests.size(); ++i){
         relax(requests[i].first, requests[i].second, tent, B);
     }
@@ -68,7 +68,7 @@ std::vector<int> seqDeltaStepping(const Graph& graph, int source, int _DELTA, in
 
     std::vector< std::priority_queue<int> > B(b); // b buckets (vectors) stored in B, priority queues
     std::vector<int> tent(N); // tentative distances
-    std::vector< std::vector<pii> > adj_list = graph.get_adj_list();
+    std::vector< std::vector<Pii> > adj_list = graph.get_adj_list();
 
     for(int i = 0; i < N; ++i){
         tent[i] = INF;
@@ -86,12 +86,12 @@ std::vector<int> seqDeltaStepping(const Graph& graph, int source, int _DELTA, in
         }
         std::priority_queue<int> R;
         while( !(B[i].empty()) ){
-            std::vector<pii> Req_light = findRequests(B[i], true, adj_list, tent);
+            std::vector<Pii> Req_light = findRequests(B[i], true, adj_list, tent);
             R = B[i];
             B[i] = std::priority_queue<int>();
             relaxRequests(Req_light, tent, B);
         }
-        std::vector<pii> Req_heavy = findRequests(R, false, adj_list, tent);
+        std::vector<Pii> Req_heavy = findRequests(R, false, adj_list, tent);
         relaxRequests(Req_heavy, tent, B);
     }
     return tent;
