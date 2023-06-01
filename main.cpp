@@ -1,11 +1,29 @@
 #include <chrono>
+#include <cmath>
 
 #include "deltastep_algorithm.cpp"
 #include "djikstra_algorithm.cpp"
 
-int main() {
+pii smallestAndLongestEdges(vector< vector<pii> > adjMat, int N){
+	int min = INF;
+	int max = -INF;
+	for (size_t i = 0; i < N; ++i) {
+		for(auto edge : adjMat[i]) {
+            int weight = edge.second;
+			if (weight > max) {
+                max = weight;
+            }
+			if (weight < min && weight > 0) {
+				min = weight;
+			}
+		}
+	}
+	return make_pair(min, max);
+}
+
+int main(int argc, char* argv[]) {
     // USING DELTA STEP OR DIJKSTRA?
-    bool delta_step = false;
+    bool delta_step = true;
 
     // Test graph from Abdul Bari (youtube)
     // with source node 0
@@ -82,7 +100,20 @@ int main() {
 
     // Find the shortest paths from vertex 0
     if (delta_step) {
-        dist = seqDeltaStepping(g, 0, 1, 45);
+        std::cout << "here1" << std::endl; 
+        vector< vector<pii> > adjMat = g.get_adj_list();
+
+        pii p = smallestAndLongestEdges(adjMat, g.size());
+        std::cout << "here2" << std::endl; 
+        int DELTA = p.first;
+        if (argc == 2) {
+            DELTA = stoi(argv[1]);
+        }
+        std::cout << "here3" << std::endl; 
+        int b = 1 + std::ceil(p.second/DELTA);
+        std::cout << "b=" << b << "DELTA=" << DELTA << std::endl; 
+        dist = seqDeltaStepping(g, 0, DELTA, b);
+        std::cout << "here5" << std::endl;
     } else {
         dist = dijkstra(g, 0);
     }

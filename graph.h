@@ -6,7 +6,7 @@
 
 using namespace std;
 
-typedef pair<int, int> pii; // (weight, vertex)
+typedef pair<int, int> pii; // (vertex, weight)
 
 class Graph {
     int vertices; // number of vertices
