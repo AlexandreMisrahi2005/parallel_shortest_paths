@@ -4,7 +4,7 @@
 #include "deltastepping.cpp"
 #include "dijkstra.cpp"
 
-pii smallestAndLongestEdges(vector< vector<pii> > adjMat, int N){
+pii smallestAndLongestEdges(std::vector<std::vector<pii> > adjMat, int N){
 	int min = INF;
 	int max = -INF;
 	for (size_t i = 0; i < N; ++i) {
@@ -18,7 +18,7 @@ pii smallestAndLongestEdges(vector< vector<pii> > adjMat, int N){
 			}
 		}
 	}
-	return make_pair(min, max);
+	return std::make_pair(min, max);
 }
 
 int main(int argc, char* argv[]) {
@@ -100,16 +100,16 @@ int main(int argc, char* argv[]) {
     // g.add_edge(14, 13, 8);
 
 
-    vector<int> dist;
+    std::vector<int> dist;
 
     // Find the shortest paths from vertex 0
     std::string algo = argv[1];
     if (algo == "deltastepping") {
-        vector< vector<pii> > adjMat = g.get_adj_list();
+        std::vector<std::vector<pii>> adjMat = g.get_adj_list();
         pii p = smallestAndLongestEdges(adjMat, g.size());
         int DELTA = p.first;
         if (argc == 3) {
-            DELTA = stoi(argv[2]);
+            DELTA = std::stoi(argv[2]);
         }
         int b = 1 + std::ceil(p.second/DELTA);
 
@@ -128,9 +128,9 @@ int main(int argc, char* argv[]) {
     }
 
     // print the shortest paths
-    cout << "Vertex\tDistance from Source\n";
+    std::cout << "Vertex\tDistance from Source" << std::endl;
     for (int i = 0; i < g.size(); ++i) {
-        cout << i << "\t" << dist[i] << "\n";
+        std::cout << i << "\t" << dist[i] << std::endl;
     }
 
     return 0;
