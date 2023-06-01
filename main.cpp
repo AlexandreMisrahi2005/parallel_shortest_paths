@@ -2,7 +2,7 @@
 #include <cmath>
 
 #include "deltastepping.cpp"
-#include "dijkstra.cpp"
+#include "djikstra.cpp"
 
 pii smallestAndLongestEdges(vector< vector<pii> > adjMat, int N){
 	int min = INF;
