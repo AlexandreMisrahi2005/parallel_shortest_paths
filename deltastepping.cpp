@@ -116,7 +116,6 @@ std::vector<int> seqDeltaStepping(const Graph &graph, int source, int _DELTA, in
 
 std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, int _b)
 {
-
     N = graph.size();
     DELTA = _DELTA;
     b = _b;
