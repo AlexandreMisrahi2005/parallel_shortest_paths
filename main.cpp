@@ -4,27 +4,35 @@
 #include "deltastepping.cpp"
 #include "dijkstra.cpp"
 
-Pii smallestAndLongestEdges(std::vector<std::vector<Pii> > adjMat, int N){
-	int min = INF;
-	int max = -INF;
-	for (size_t i = 0; i < N; ++i) {
-		for(auto edge : adjMat[i]) {
+Pii smallestAndLongestEdges(std::vector<std::vector<Pii>> adjMat, int N)
+{
+    int min = INF;
+    int max = -INF;
+    for (size_t i = 0; i < N; ++i)
+    {
+        for (auto edge : adjMat[i])
+        {
             int weight = edge.second;
-			if (weight > max) {
+            if (weight > max)
+            {
                 max = weight;
             }
-			if (weight < min && weight > 0) {
-				min = weight;
-			}
-		}
-	}
-	return std::make_pair(min, max);
+            if (weight < min && weight > 0)
+            {
+                min = weight;
+            }
+        }
+    }
+    return std::make_pair(min, max);
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[])
+{
 
-    if (argc < 2) {
-        std::cout << "Usage: " << argv[0] << " <algorithm to use: [dijkstra, deltastepping]> " << " <optional: delta for deltastepping algorithm: [integer]> " << std::endl;
+    if (argc < 2)
+    {
+        std::cout << "Usage: " << argv[0] << " <algorithm to use: [dijkstra, deltastepping]> "
+                  << " <optional: delta for deltastepping algorithm: [integer]> " << std::endl;
         return 1;
     }
 
@@ -99,37 +107,40 @@ int main(int argc, char* argv[]) {
     // g.add_edge(14, 9, 2);
     // g.add_edge(14, 13, 8);
 
-
     std::vector<int> dist;
 
     // Find the shortest paths from vertex 0
     std::string algo = argv[1];
-    if (algo == "deltastepping") {
+    if (algo == "deltastepping")
+    {
         std::vector<std::vector<Pii>> adjMat = g.get_adj_list();
         Pii p = smallestAndLongestEdges(adjMat, g.size());
         int DELTA = p.first;
-        if (argc == 3) {
+        if (argc == 3)
+        {
             DELTA = std::stoi(argv[2]);
         }
-        int b = 1 + std::ceil(p.second/DELTA);
+        int b = 1 + std::ceil(p.second / DELTA);
 
         // Start the timer
         auto start = std::chrono::high_resolution_clock::now();
 
-        dist = seqDeltaStepping(g, 0, DELTA, b);  // graph, source node, delta, b (number of buckets)
-        
+        dist = seqDeltaStepping(g, 0, DELTA, b); // graph, source node, delta, b (number of buckets)
+
         // End the timer
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
         std::cout << "Operation took " << duration << " µs." << std::endl;
-    } 
-    else if (algo == "dijkstra") {
+    }
+    else if (algo == "dijkstra")
+    {
         dist = dijkstra(g, 0);
     }
 
     // print the shortest paths
     std::cout << "Vertex\tDistance from Source" << std::endl;
-    for (int i = 0; i < g.size(); ++i) {
+    for (int i = 0; i < g.size(); ++i)
+    {
         std::cout << i << "\t" << dist[i] << std::endl;
     }
 
