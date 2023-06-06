@@ -69,6 +69,14 @@ void relaxRequests(std::vector<Pii> requests, std::vector<int> &tent, std::vecto
     }
 }
 
+void relaxRequestsPAR(std::vector<Pii> requests, std::vector<int> &tent, std::vector<std::priority_queue<int>> &B)
+{
+    for (int i = 0; i < requests.size(); ++i)
+    {
+        relax(requests[i].first, requests[i].second, tent, B);
+    }
+}
+
 /*
  * adj_list: adjacency matrix of the graph
  * source: source, 0 ≤ s < N
@@ -152,7 +160,7 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
             R_l = findRequests(B[k], true, adj_list, tent);
             R_h = findRequests(B[k], false, adj_list, tent);
 
-            // relaxRequests(R_l, tent, B);
+            relaxRequests(R_l, tent, B);
 
             std::vector<std::vector<Pii>> SubRL;
             int threads = THREAD_NUM;
@@ -173,7 +181,7 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
                 {
                     R.push_back(R_l[j]);
                 }
-                workersL.push_back(std::thread(&relaxRequests, R, std::ref(tent), std::ref(B)));
+                workersL.push_back(std::thread(&relaxRequestsPAR, R, std::ref(tent), std::ref(B)));
                 SubRL.push_back(R);
             }
 
@@ -206,16 +214,12 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
             };
         };
 
-        // relaxRequests(R_h, tent, B);
+        relaxRequests(R_h, tent, B);
         std::vector<std::vector<Pii>> SubRH;
         int threads = THREAD_NUM;
         if (threads > R_h.size())
         {
             threads = R_h.size();
-        }
-        if (threads == 0)
-        {
-            threads = 1;
         }
         int blockstart = 0;
         int blocksize = R_h.size() / threads;
@@ -228,7 +232,7 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
             {
                 Rh.push_back(R_h[j]);
             }
-            workersH.push_back(std::thread(&relaxRequests, Rh, std::ref(tent), std::ref(B)));
+            workersH.push_back(std::thread(&relaxRequestsPAR, Rh, std::ref(tent), std::ref(B)));
             SubRH.push_back(Rh);
         }
         std::vector<Pii> Rh;
@@ -260,7 +264,7 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
         };
 
         int i = 0;
-        while (B[i].empty() && i < b)
+        while (B[i].empty())
         {
             i++;
         }
@@ -269,47 +273,47 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
     return tent;
 };
 
-// int main() {
+int main() {
 
-//     /*
-//     Test graph from Abdul Bari (youtube)
-//     with source node 0
-//     result should be:
-//     0 2 3 8 6 9
-//     */
+    /*
+    Test graph from Abdul Bari (youtube)
+    with source node 0
+    result should be:
+    0 2 3 8 6 9
+    */
 
-//     Graph g(6);
+    Graph g(6);
 
-//     g.add_edge(0, 1, 2);
-//     g.add_edge(0, 2, 4);
-//     g.add_edge(1, 2, 1);
-//     g.add_edge(1, 3, 7);
-//     g.add_edge(2, 4, 3);
-//     g.add_edge(3, 5, 1);
-//     g.add_edge(4, 5, 5);
-//     g.add_edge(4, 3, 2);
+    g.add_edge(0, 1, 2);
+    g.add_edge(0, 2, 4);
+    g.add_edge(1, 2, 1);
+    g.add_edge(1, 3, 7);
+    g.add_edge(2, 4, 3);
+    g.add_edge(3, 5, 1);
+    g.add_edge(4, 5, 5);
+    g.add_edge(4, 3, 2);
 
-//     std::vector<int> dist;
+    std::vector<int> dist;
 
-//     // Find the shortest paths from vertex 0
-//     std::vector<std::vector<Pii>> adjMat = g.get_adj_list();
+    // Find the shortest paths from vertex 0
+    std::vector<std::vector<Pii>> adjMat = g.get_adj_list();
 
-//     // Start the timer
-//     auto start = std::chrono::high_resolution_clock::now();
+    // Start the timer
+    auto start = std::chrono::high_resolution_clock::now();
 
-//     dist = parDeltaStepping(g, 0, 1, 50);  // graph, source node, delta, b (number of buckets)
+    dist = parDeltaStepping(g, 0, 1, 50);  // graph, source node, delta, b (number of buckets)
     
-//     // End the timer
-//     auto end = std::chrono::high_resolution_clock::now();
-//     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-//     std::cout << "Operation took " << duration << " µs." << std::endl;
+    // End the timer
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    std::cout << "Operation took " << duration << " µs." << std::endl;
     
 
-//     // print the shortest paths
-//     std::cout << "Vertex\tDistance from Source" << std::endl;
-//     for (int i = 0; i < g.size(); ++i) {
-//         std::cout << i << "\t" << dist[i] << std::endl;
-//     }
+    // print the shortest paths
+    std::cout << "Vertex\tDistance from Source" << std::endl;
+    for (int i = 0; i < g.size(); ++i) {
+        std::cout << i << "\t" << dist[i] << std::endl;
+    }
 
-//     return 0;
-// };
+    return 0;
+};
