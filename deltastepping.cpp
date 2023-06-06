@@ -148,7 +148,7 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
             R_l = findRequests(B[k], true, adj_list, tent);
             R_h = findRequests(B[k], false, adj_list, tent);
 
-            relaxRequests(R_l, tent, B);
+            // relaxRequests(R_l, tent, B);
 
             std::vector<std::vector<Pii>> SubRL;
             int threads = THREAD_NUM;
@@ -202,12 +202,16 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
             };
         };
 
-        relaxRequests(R_h, tent, B);
+        // relaxRequests(R_h, tent, B);
         std::vector<std::vector<Pii>> SubRH;
         int threads = THREAD_NUM;
         if (threads > R_h.size())
         {
             threads = R_h.size();
+        }
+        if (threads == 0)
+        {
+            threads = 1;
         }
         int blockstart = 0;
         int blocksize = R_h.size() / threads;
@@ -252,7 +256,7 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
         };
 
         int i = 0;
-        while (B[i].empty())
+        while (B[i].empty() && i < b)
         {
             i++;
         }
