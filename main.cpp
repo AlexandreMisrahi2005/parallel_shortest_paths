@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
         // Start the timer
         auto start = std::chrono::high_resolution_clock::now();
 
-        dist = seqDeltaStepping(g, 0, DELTA, b);  // graph, source node, delta, b (number of buckets)
+        dist = parDeltaStepping(g, 0, DELTA, 50);  // graph, source node, delta, b (number of buckets)
         
         // End the timer
         auto end = std::chrono::high_resolution_clock::now();

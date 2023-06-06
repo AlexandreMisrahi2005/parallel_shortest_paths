@@ -27,7 +27,7 @@ void relax(int w, int x, std::vector<int> &tent, std::vector<std::priority_queue
     if (x < tent[w])
     {
         if (tent[w] != INF)
-        {
+        {   
             B[(tent[w] / DELTA) % b].pop(); // remove from old bucket
         }
         B[(x / DELTA) % b].push(w); // insert in new bucket
@@ -120,7 +120,6 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
     DELTA = _DELTA;
     b = _b;
 
-    int MAX = 50; // Change later
     int THREAD_NUM = 15;
     std::vector<std::thread> workersL;
     std::vector<std::thread> workersH;
@@ -134,27 +133,33 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
         tent[i] = INF;
     }
 
+    B[0].push(source);
     tent[source] = 0;
 
     int k = 0;
-    while (k < MAX)
+    while (k < b)
     {
         // define heavy and light requests
         std::vector<Pii> R_h;
         std::vector<Pii> R_l;
         while (!B[k].empty())
         {
-
             R_l = findRequests(B[k], true, adj_list, tent);
             R_h = findRequests(B[k], false, adj_list, tent);
 
-            // relaxRequests(R_l, tent, B);
+            B[k] = std::priority_queue<int>();
 
+            relaxRequests(R_l, tent, B);
             std::vector<std::vector<Pii>> SubRL;
+
             int threads = THREAD_NUM;
             if (threads > R_l.size())
             {
                 threads = R_l.size();
+            }
+            if (threads == 0)
+            {
+                threads = 1;
             }
 
             int blockstart = 0;
@@ -165,9 +170,9 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
                 int blockend = blockstart;
                 blockend = blockend + blocksize;
                 std::vector<Pii> R;
-                for (int i = blockstart; i < blockend; i++)
+                for (int j = blockstart; j < blockend; j++)
                 {
-                    R.push_back(R_l[i]);
+                    R.push_back(R_l[j]);
                 }
                 workersL.push_back(std::thread(&relaxRequests, R, std::ref(tent), std::ref(B)));
                 SubRL.push_back(R);
@@ -200,60 +205,114 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
                     }
                 }
             };
-        };
 
-        // relaxRequests(R_h, tent, B);
-        std::vector<std::vector<Pii>> SubRH;
-        int threads = THREAD_NUM;
-        if (threads > R_h.size())
-        {
-            threads = R_h.size();
-        }
-        if (threads == 0)
-        {
-            threads = 1;
-        }
-        int blockstart = 0;
-        int blocksize = R_h.size() / threads;
-        for (int i = 0; i < threads - 1; i++)
-        {
-            int blockend = blockstart;
-            blockend = blockend + blocksize;
+            relaxRequests(R_h, tent, B);
+            std::vector<std::vector<Pii>> SubRH;
+            threads = THREAD_NUM;
+            if (threads > R_h.size())
+            {
+                threads = R_h.size();
+            }
+            if (threads == 0)
+            {
+                threads = 1;
+            }
+            blockstart = 0;
+            blocksize = R_h.size() / threads;
+            for (int i = 0; i < threads - 1; i++)
+            {
+                int blockend = blockstart;
+                blockend = blockend + blocksize;
+                std::vector<Pii> Rh;
+                for (int j = blockstart; j < blockend; j++)
+                {
+                    Rh.push_back(R_h[j]);
+                }
+                workersH.push_back(std::thread(&relaxRequests, Rh, std::ref(tent), std::ref(B)));
+                SubRH.push_back(Rh);
+            }
             std::vector<Pii> Rh;
-            for (int i = blockstart; i < blockend; i++)
+            for (int i = blockstart; i < R_h.size(); i++)
             {
                 Rh.push_back(R_h[i]);
             }
-            workersH.push_back(std::thread(&relaxRequests, Rh, std::ref(tent), std::ref(B)));
+            relaxRequests(Rh, tent, B);
             SubRH.push_back(Rh);
-        }
-        std::vector<Pii> Rh;
-        for (int i = blockstart; i < R_h.size(); i++)
-        {
-            Rh.push_back(R_h[i]);
-        }
-        relaxRequests(Rh, tent, B);
-        SubRH.push_back(Rh);
 
-        for (int i = 0; i < threads - 1; i++)
-        {
-            if (workersH[i].joinable())
+            for (int i = 0; i < threads - 1; i++)
             {
-                workersH[i].join();
-            };
-        };
-
-        R_h.clear();
-        for (int it = 0; it < SubRH.size(); it++)
-        {
-            if (SubRH[it].size() > 0)
-            {
-                for (int i = 0; i < SubRH.size(); i++)
+                if (workersH[i].joinable())
                 {
-                    R_h.push_back(SubRH[it][i]);
+                    workersH[i].join();
+                };
+            };
+
+            R_h.clear();
+            for (int it = 0; it < SubRH.size(); it++)
+            {
+                if (SubRH[it].size() > 0)
+                {
+                    for (int i = 0; i < SubRH.size(); i++)
+                    {
+                        R_h.push_back(SubRH[it][i]);
+                    }
                 }
-            }
+            };
+
         };
+
+        // relaxRequests(R_h, tent, B);
+        // std::vector<std::vector<Pii>> SubRH;
+        // int threads = THREAD_NUM;
+        // if (threads > R_h.size())
+        // {
+        //     threads = R_h.size();
+        // }
+        // if (threads == 0)
+        // {
+        //     threads = 1;
+        // }
+        // int blockstart = 0;
+        // int blocksize = R_h.size() / threads;
+        // for (int i = 0; i < threads - 1; i++)
+        // {
+        //     int blockend = blockstart;
+        //     blockend = blockend + blocksize;
+        //     std::vector<Pii> Rh;
+        //     for (int j = blockstart; j < blockend; j++)
+        //     {
+        //         Rh.push_back(R_h[j]);
+        //     }
+        //     workersH.push_back(std::thread(&relaxRequests, Rh, std::ref(tent), std::ref(B)));
+        //     SubRH.push_back(Rh);
+        // }
+        // std::vector<Pii> Rh;
+        // for (int i = blockstart; i < R_h.size(); i++)
+        // {
+        //     Rh.push_back(R_h[i]);
+        // }
+        // relaxRequests(Rh, tent, B);
+        // SubRH.push_back(Rh);
+
+        // for (int i = 0; i < threads - 1; i++)
+        // {
+        //     if (workersH[i].joinable())
+        //     {
+        //         workersH[i].join();
+        //     };
+        // };
+
+        // R_h.clear();
+        // for (int it = 0; it < SubRH.size(); it++)
+        // {
+        //     if (SubRH[it].size() > 0)
+        //     {
+        //         for (int i = 0; i < SubRH.size(); i++)
+        //         {
+        //             R_h.push_back(SubRH[it][i]);
+        //         }
+        //     }
+        // };
 
         int i = 0;
         while (B[i].empty() && i < b)
@@ -261,6 +320,10 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
             i++;
         }
         k = i;
+    }
+    for (int i = 0; i < tent.size(); i++)
+    {
+        std::cout << i << " : " << tent[i] << std::endl;
     }
     return tent;
 };
