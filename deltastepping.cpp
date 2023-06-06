@@ -169,7 +169,7 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
                 {
                     R.push_back(R_l[i]);
                 }
-                workersL.push_back(std::thread(&relaxRequests, std::ref(R), tent, B));
+                workersL.push_back(std::thread(&relaxRequests, R, std::ref(tent), std::ref(B)));
                 SubRL.push_back(R);
             }
 
@@ -220,7 +220,7 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
             {
                 Rh.push_back(R_h[i]);
             }
-            workersH.push_back(std::thread(&relaxRequests, std::ref(Rh), tent, B));
+            workersH.push_back(std::thread(&relaxRequests, Rh, std::ref(tent), std::ref(B)));
             SubRH.push_back(Rh);
         }
         std::vector<Pii> Rh;
