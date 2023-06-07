@@ -1,6 +1,7 @@
 #include <chrono>
 #include <cmath>
 #include <fstream>
+#include <sstream>
 
 #include "deltastepping.cpp"
 #include "dijkstra.cpp"
@@ -27,9 +28,41 @@ Pii smallestAndLongestEdges(std::vector<std::vector<Pii>> adjMat, int N)
     return std::make_pair(min, max);
 }
 
-// Graph* genRandomGraph(int n, double m){
+Graph genRandomGraph(int n, int m){
+    Graph g(n);
+    for (int i = 0; i < m; ++i){
+        std::srand(std::time(nullptr)); // use current time as seed for random generator
+        int u = std::rand()%n;          // generate random integer in [0, INT_MAX] and scale
+        int v = std::rand()%n;
+        double w = static_cast <double> (rand()) / static_cast <double> (RAND_MAX); // random double in [0,1]
+        g.add_edge(u,v,w);
+    }
+    return g;
+}
 
-// }
+/*
+Function to parse an RMAT file into a Graph object
+*/
+Graph parseRMAT(int n, std::string filename = "rmat.txt"){
+    std::ifstream file(filename);
+    if (!file) {
+        std::cerr << "Error: Failed to open the file." << std::endl;
+        return 1;
+    }
+    Graph g(n);
+    std::string line;
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        int u, v, w;
+        if (iss >> u >> v >> w) {
+            g.add_edge(u,v,w);
+        } else {
+            std::cerr << "Error: Failed to parse line: " << line << std::endl;
+        }
+    }
+    file.close();
+    return g;
+}
 
 int main(int argc, char *argv[])
 {
@@ -48,16 +81,16 @@ int main(int argc, char *argv[])
     0 2 3 8 6 9
     */
 
-    Graph g(6);
+    // Graph g(6);
 
-    g.add_edge(0, 1, 2);
-    g.add_edge(0, 2, 4);
-    g.add_edge(1, 2, 1);
-    g.add_edge(1, 3, 7);
-    g.add_edge(2, 4, 3);
-    g.add_edge(3, 5, 1);
-    g.add_edge(4, 5, 5);
-    g.add_edge(4, 3, 2);
+    // g.add_edge(0, 1, 2);
+    // g.add_edge(0, 2, 4);
+    // g.add_edge(1, 2, 1);
+    // g.add_edge(1, 3, 7);
+    // g.add_edge(2, 4, 3);
+    // g.add_edge(3, 5, 1);
+    // g.add_edge(4, 5, 5);
+    // g.add_edge(4, 3, 2);
 
     /*
     Test Graph
@@ -112,6 +145,22 @@ int main(int argc, char *argv[])
     // g.add_edge(14, 9, 2);
     // g.add_edge(14, 13, 8);
 
+
+    /*
+    Test random graph
+    with source node 0
+    */
+    // g = genRandomGraph(1<<20, 1<<18);
+
+
+    /*
+    Test RMAT
+    */
+    Graph g(1000000);
+    g = parseRMAT(1000000, "rmat_large.txt");
+
+
+
     std::vector<double> dist;
 
     // Find the shortest paths from vertex 0
@@ -140,14 +189,20 @@ int main(int argc, char *argv[])
     }
     else if (algo == "dijkstra")
     {
+        auto start = std::chrono::high_resolution_clock::now();
         dist = dijkstra(g, 0);
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+        std::cout << "Operation took " << duration << " µs." << std::endl;
     }
 
     // print the shortest paths
-    std::cout << "Vertex\tDistance from Source" << std::endl;
-    for (int i = 0; i < g.size(); ++i)
-    {
-        std::cout << i << "\t" << dist[i] << std::endl;
+    if (g.size() < 100){
+        std::cout << "Vertex\tDistance from Source" << std::endl;
+        for (int i = 0; i < g.size(); ++i)
+        {
+            std::cout << i << "\t" << dist[i] << std::endl;
+        }
     }
 
     std::ofstream outFile("output_sssp.txt");
