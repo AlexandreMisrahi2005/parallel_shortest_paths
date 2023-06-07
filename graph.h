@@ -4,7 +4,7 @@
 #include <vector>
 #include <iostream>
 
-typedef std::pair<int, int> Pii; // (vertex, weight)
+typedef std::pair<int, double> Pii; // (vertex, weight)
 
 class Graph
 {
@@ -18,7 +18,7 @@ public:
     }
 
     // add an edge between vertices u and v with weight
-    void add_edge(int u, int v, int weight)
+    void add_edge(int u, int v, double weight)
     {
         adj_list[u].push_back(std::make_pair(v, weight));
         adj_list[v].push_back(std::make_pair(u, weight));

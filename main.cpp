@@ -1,5 +1,6 @@
 #include <chrono>
 #include <cmath>
+#include <fstream>
 
 #include "deltastepping.cpp"
 #include "dijkstra.cpp"
@@ -12,7 +13,7 @@ Pii smallestAndLongestEdges(std::vector<std::vector<Pii>> adjMat, int N)
     {
         for (auto edge : adjMat[i])
         {
-            int weight = edge.second;
+            double weight = edge.second;
             if (weight > max)
             {
                 max = weight;
@@ -25,6 +26,10 @@ Pii smallestAndLongestEdges(std::vector<std::vector<Pii>> adjMat, int N)
     }
     return std::make_pair(min, max);
 }
+
+// Graph* genRandomGraph(int n, double m){
+
+// }
 
 int main(int argc, char *argv[])
 {
@@ -107,7 +112,7 @@ int main(int argc, char *argv[])
     // g.add_edge(14, 9, 2);
     // g.add_edge(14, 13, 8);
 
-    std::vector<int> dist;
+    std::vector<double> dist;
 
     // Find the shortest paths from vertex 0
     std::string algo = argv[1];
@@ -115,12 +120,13 @@ int main(int argc, char *argv[])
     {
         std::vector<std::vector<Pii>> adjMat = g.get_adj_list();
         Pii p = smallestAndLongestEdges(adjMat, g.size());
-        int DELTA = p.first;
+        double DELTA = p.first;
         if (argc == 3)
         {
-            DELTA = std::stoi(argv[2]);
+            DELTA = std::stod(argv[2]);
         }
         int b = 1 + std::ceil(p.second / DELTA);
+        b = 50;
 
         // Start the timer
         auto start = std::chrono::high_resolution_clock::now();
@@ -143,6 +149,9 @@ int main(int argc, char *argv[])
     {
         std::cout << i << "\t" << dist[i] << std::endl;
     }
+
+    std::ofstream outFile("output_sssp.txt");
+    for (const auto &e : dist) outFile << e << "\n";
 
     return 0;
 }

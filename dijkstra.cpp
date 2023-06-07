@@ -4,14 +4,14 @@
 #include "graph.h"
 
 // Dijkstra algorithm from Wikipedia Pseudo-code
-std::vector<int> dijkstra(const Graph &graph, int source)
+std::vector<double> dijkstra(const Graph &graph, int source)
 {
     int n = graph.size();
 
     if (source < 0 || source >= n)
         throw std::invalid_argument("Invalid source vertex");
 
-    std::vector<int> dist(n, std::numeric_limits<int>::max());
+    std::vector<double> dist(n, std::numeric_limits<double>::max());
     std::vector<bool> visited(n, false);
     std::vector<std::vector<Pii>> adj_list = graph.get_adj_list();
     std::queue<Pii> Q; // Queue of vertices
@@ -33,7 +33,7 @@ std::vector<int> dijkstra(const Graph &graph, int source)
         for (auto edge : adj_list[u])
         {
             int v = edge.first;
-            int weight = edge.second;
+            double weight = edge.second;
 
             // v must not be visited and the distance to v through u must be less than the current distance
             int alt = dist[u] + weight;

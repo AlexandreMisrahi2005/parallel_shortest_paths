@@ -4,10 +4,10 @@
 #include "graph.h"
 
 // constants
-const int INF = std::numeric_limits<int>::max(); // virtual infinity
-int DELTA;                                       // parameter of Delta-Stepping
-int b;                                           // number of buckets
-int N;                                           // number of vertices
+const int INF = std::numeric_limits<double>::max(); // virtual infinity
+int DELTA;                                          // parameter of Delta-Stepping
+int b;                                              // number of buckets
+int N;                                              // number of vertices
 
 bool isNotEmpty(std::vector<std::priority_queue<int>> bucket_vec)
 {
@@ -21,21 +21,21 @@ bool isNotEmpty(std::vector<std::priority_queue<int>> bucket_vec)
     return false;
 }
 
-void relax(int w, int x, std::vector<int> &tent, std::vector<std::priority_queue<int>> &B)
+void relax(int w, int x, std::vector<double> &tent, std::vector<std::priority_queue<int>> &B)
 {
     if (x < tent[w])
     {
         if (tent[w] != INF)
         {
 
-            B[(tent[w] / DELTA) % b].pop(); // remove from old bucket
+            B[(tent[w] / DELTA)].pop(); // remove from old bucket
         }
-        B[(x / DELTA) % b].push(w); // insert in new bucket
+        B[(x / DELTA)].push(w); // insert in new bucket
         tent[w] = x;
     }
 }
 
-std::vector<Pii> findRequests(std::priority_queue<int> bucket, bool light_edge, std::vector<std::vector<Pii>> adj_list, std::vector<int> tent)
+std::vector<Pii> findRequests(std::priority_queue<int> bucket, bool light_edge, std::vector<std::vector<Pii>> adj_list, std::vector<double> tent)
 {
     std::vector<Pii> requests;
 
@@ -47,7 +47,7 @@ std::vector<Pii> findRequests(std::priority_queue<int> bucket, bool light_edge, 
         for (auto edge : adj_list[i])
         {
             int j = edge.first;
-            int weight = edge.second;
+            double weight = edge.second;
 
             if (weight > 0 && ((light_edge && weight <= DELTA) || (!light_edge && weight > DELTA)))
             {
@@ -58,7 +58,7 @@ std::vector<Pii> findRequests(std::priority_queue<int> bucket, bool light_edge, 
     return requests;
 }
 
-void relaxRequests(std::vector<Pii> requests, std::vector<int> &tent, std::vector<std::priority_queue<int>> &B)
+void relaxRequests(std::vector<Pii> requests, std::vector<double> &tent, std::vector<std::priority_queue<int>> &B)
 {
     for (int i = 0; i < requests.size(); ++i)
     {
@@ -72,20 +72,20 @@ void relaxRequests(std::vector<Pii> requests, std::vector<int> &tent, std::vecto
  * tent: result array of length N, contains the shortest paths to source
  * N: number of nodes in adj_list, length of tent
  */
-std::vector<int> seqDeltaStepping(const Graph &graph, int source, int _DELTA, int _b)
+std::vector<double> seqDeltaStepping(const Graph &graph, int source, double _DELTA, int _b)
 {
     N = graph.size();
     DELTA = _DELTA;
     b = _b;
 
     std::vector<std::priority_queue<int>> B(b); // b buckets (vectors) stored in B, priority queues
-    std::vector<int> tent(N);                   // tentative distances
+    std::vector<double> tent(N, INF);                   // tentative distances
     std::vector<std::vector<Pii>> adj_list = graph.get_adj_list();
 
-    for (int i = 0; i < N; ++i)
-    {
-        tent[i] = INF;
-    }
+    // for (int i = 0; i < N; ++i)
+    // {
+    //     tent[i] = INF;
+    // }
 
     tent[source] = 0;
     B[0].push(source);
