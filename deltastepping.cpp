@@ -27,7 +27,7 @@ void relax(int w, int x, std::vector<int> &tent, std::vector<std::priority_queue
     if (x < tent[w])
     {
         if (tent[w] != INF)
-        {   
+        {
             B[(tent[w] / DELTA) % b].pop(); // remove from old bucket
         }
         B[(x / DELTA) % b].push(w); // insert in new bucket
@@ -120,9 +120,7 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
     DELTA = _DELTA;
     b = _b;
 
-    int THREAD_NUM = 15;
-    std::vector<std::thread> workersL;
-    std::vector<std::thread> workersH;
+    int THREAD_NUM = 3;
 
     std::vector<std::priority_queue<int>> B(b); // b buckets (vectors) stored in B, priority queues
     std::vector<int> tent(N);                   // tentative distances
@@ -136,20 +134,24 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
     B[0].push(source);
     tent[source] = 0;
 
+    // define heavy and light requests
+    std::vector<Pii> R_h;
+    std::vector<Pii> R_l;
+
     int k = 0;
     while (k < b)
     {
-        // define heavy and light requests
-        std::vector<Pii> R_h;
-        std::vector<Pii> R_l;
         while (!B[k].empty())
         {
+            std::vector<std::thread> workersL;
+            std::vector<std::thread> workersH;
+            
             R_l = findRequests(B[k], true, adj_list, tent);
             R_h = findRequests(B[k], false, adj_list, tent);
 
             B[k] = std::priority_queue<int>();
 
-            relaxRequests(R_l, tent, B);
+            // relaxRequests(R_l, tent, B);
             std::vector<std::vector<Pii>> SubRL;
 
             int threads = THREAD_NUM;
@@ -188,10 +190,18 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
 
             for (int i = 0; i < threads - 1; i++)
             {
-                if (workersL[i].joinable())
+                try
                 {
-                    workersL[i].join();
-                };
+                    if (workersL[i].joinable())
+                    {
+                        // std::cout << "Joining workersL[" << i << "]" << std::endl;
+                        workersL[i].join();
+                    }
+                }
+                catch (const std::exception &e)
+                {
+                    std::cerr << "LTHREAD: Exception caught while joining thread: " << e.what() << '\n';
+                }
             };
 
             R_l.clear();
@@ -241,10 +251,18 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
 
             for (int i = 0; i < threads - 1; i++)
             {
-                if (workersH[i].joinable())
+                try
                 {
-                    workersH[i].join();
-                };
+                    if (workersH[i].joinable())
+                    {   
+                        // std::cout << "Joining workersH[" << i << "]" << std::endl;
+                        workersH[i].join();
+                    }
+                }
+                catch (const std::exception &e)
+                {
+                    std::cerr << "HTHREAD: Exception caught while joining thread: " << e.what() << '\n';
+                }
             };
 
             R_h.clear();
@@ -258,7 +276,6 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
                     }
                 }
             };
-
         };
 
         // relaxRequests(R_h, tent, B);
@@ -321,9 +338,9 @@ std::vector<int> parDeltaStepping(const Graph &graph, int source, int _DELTA, in
         }
         k = i;
     }
-    for (int i = 0; i < tent.size(); i++)
-    {
-        std::cout << i << " : " << tent[i] << std::endl;
-    }
+    // for (int i = 0; i < tent.size(); i++)
+    // {
+    //     std::cout << i << " : " << tent[i] << std::endl;
+    // }
     return tent;
 };
