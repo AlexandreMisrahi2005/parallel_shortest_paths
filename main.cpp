@@ -154,11 +154,13 @@ int main(int argc, char *argv[])
 
 
     /*
-    Test RMAT
+    Test RMAT:
+    rmat_small.txt: 100 nodes, 20 edges
+    rmat_medium.txt: 10 000 nodes, 10 000 edges
+    rmat_large.txt: 1 000 000 nodes, 100 000 edges
     */
     Graph g(1000000);
     g = parseRMAT(1000000, "rmat_large.txt");
-
 
 
     std::vector<double> dist;
