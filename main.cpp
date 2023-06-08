@@ -1,30 +1,76 @@
 #include <chrono>
 #include <cmath>
+#include <fstream>
+#include <sstream>
 
 #include "deltastepping.cpp"
 #include "dijkstra.cpp"
 
-Pii smallestAndLongestEdges(std::vector<std::vector<Pii> > adjMat, int N){
-	int min = INF;
-	int max = -INF;
-	for (size_t i = 0; i < N; ++i) {
-		for(auto edge : adjMat[i]) {
-            int weight = edge.second;
-			if (weight > max) {
+Pii smallestAndLongestEdges(std::vector<std::vector<Pii>> adjMat, int N)
+{
+    int min = INF;
+    int max = -INF;
+    for (size_t i = 0; i < N; ++i)
+    {
+        for (auto edge : adjMat[i])
+        {
+            double weight = edge.second;
+            if (weight > max)
+            {
                 max = weight;
             }
-			if (weight < min && weight > 0) {
-				min = weight;
-			}
-		}
-	}
-	return std::make_pair(min, max);
+            if (weight < min && weight > 0)
+            {
+                min = weight;
+            }
+        }
+    }
+    return std::make_pair(min, max);
 }
 
-int main(int argc, char* argv[]) {
+Graph genRandomGraph(int n, int m){
+    Graph g(n);
+    for (int i = 0; i < m; ++i){
+        std::srand(std::time(nullptr)); // use current time as seed for random generator
+        int u = std::rand()%n;          // generate random integer in [0, INT_MAX] and scale
+        int v = std::rand()%n;
+        double w = static_cast <double> (rand()) / static_cast <double> (RAND_MAX); // random double in [0,1]
+        g.add_edge(u,v,w);
+    }
+    return g;
+}
 
-    if (argc < 2) {
-        std::cout << "Usage: " << argv[0] << " <algorithm to use: [dijkstra, deltastepping]> " << " <optional: delta for deltastepping algorithm: [integer]> " << std::endl;
+/*
+Function to parse an RMAT file into a Graph object
+*/
+Graph parseRMAT(int n, std::string filename = "rmat.txt"){
+    std::ifstream file(filename);
+    if (!file) {
+        std::cerr << "Error: Failed to open the file." << std::endl;
+        return 1;
+    }
+    Graph g(n);
+    std::string line;
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        int u, v, w;
+        if (iss >> u >> v >> w) {
+            g.add_edge(u,v,w);
+        } else {
+            std::cerr << "Error: Failed to parse line: " << line << std::endl;
+        }
+    }
+    file.close();
+    return g;
+}
+
+int main(int argc, char *argv[])
+{
+
+    if (argc < 2)
+    {
+        std::cout << "Usage: " << argv[0] << " <algorithm to use: [dijkstra, deltastepping]> "
+                  << " <optional: delta for deltastepping algorithm: [integer]> " << std::endl;
         return 1;
     }
 
@@ -100,20 +146,38 @@ int main(int argc, char* argv[]) {
     g.add_edge(14, 13, 8);
 
 
-    std::vector<int> dist_seq;
-    std::vector<int> dist_par;
-    std::vector<int> dist_dij;
+    /*
+    Test random graph
+    with source node 0
+    */
+    // g = genRandomGraph(1<<20, 1<<18);
+
+
+    /*
+    Test RMAT
+    */
+    Graph g(1000000);
+    g = parseRMAT(1000000, "rmat_large.txt");
+
+
+
+    std::vector<double> dist_seq;
+    std::vector<double> dist_par;
+    std::vector<double> dist_dij;
 
     // Find the shortest paths from vertex 0
     std::string algo = argv[1];
-    if (algo == "deltastepping") {
+    if (algo == "deltastepping")
+    {
         std::vector<std::vector<Pii>> adjMat = g.get_adj_list();
         Pii p = smallestAndLongestEdges(adjMat, g.size());
-        int DELTA = p.first;
-        if (argc == 3) {
-            DELTA = std::stoi(argv[2]);
+        double DELTA = p.first;
+        if (argc == 3)
+        {
+            DELTA = std::stod(argv[2]);
         }
-        int b = 1 + std::ceil(p.second/DELTA);
+        int b = 1 + std::ceil(p.second / DELTA);
+        b = 50;
 
         // Start the timer
         auto start = std::chrono::high_resolution_clock::now();
@@ -156,6 +220,9 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < g.size(); ++i) {
         std::cout << i << "\t" << dist_par[i] << std::endl;
     }
+
+    // std::ofstream outFile("output_sssp.txt");
+    // for (const auto &e : dist) outFile << e << "\n";
 
     return 0;
 }
