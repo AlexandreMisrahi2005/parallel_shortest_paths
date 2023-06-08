@@ -36,10 +36,8 @@ void relax(int w, int x, std::vector<double> &tent, std::vector<std::priority_qu
     }
 }
 
-std::vector<Pii> findRequests(std::priority_queue<int> bucket, bool light_edge, std::vector<std::vector<Pii>> adj_list, std::vector<double> tent)
+std::vector<Pii> findRequests(std::vector<Pii> &requests, std::priority_queue<int> bucket, bool light_edge, std::vector<std::vector<Pii>> adj_list, std::vector<double> tent)
 {
-    std::vector<Pii> requests;
-
     while (!bucket.empty())
     {
         int i = bucket.top();
@@ -104,12 +102,14 @@ std::vector<double> seqDeltaStepping(const Graph &graph, int source, double _DEL
         std::priority_queue<int> R;
         while (!(B[i].empty()))
         {
-            std::vector<Pii> Req_light = findRequests(B[i], true, adj_list, tent);
+            std::vector<Pii> Req_light;
+            findRequests(Req_light, B[i], true, adj_list, tent);
             R = B[i];
             B[i] = std::priority_queue<int>();
             relaxRequests(Req_light, tent, B);
         }
-        std::vector<Pii> Req_heavy = findRequests(R, false, adj_list, tent);
+        std::vector<Pii> Req_heavy;
+        findRequests(Req_heavy, R, false, adj_list, tent);
         relaxRequests(Req_heavy, tent, B);
     }
     return tent;
@@ -139,6 +139,7 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
     std::vector<Pii> R_h;
     std::vector<Pii> R_l;
 
+
     int k = 0;
     while (k < b)
     {
@@ -146,9 +147,12 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
         {
             std::vector<std::thread> workersL;
             std::vector<std::thread> workersH;
+
+            R_l.clear();
+            R_h.clear();
             
-            R_l = findRequests(B[k], true, adj_list, tent);
-            R_h = findRequests(B[k], false, adj_list, tent);
+            findRequests(R_l, B[k], true, adj_list, tent);
+            findRequests(R_h, B[k], false, adj_list, tent);
 
             B[k] = std::priority_queue<int>();
 

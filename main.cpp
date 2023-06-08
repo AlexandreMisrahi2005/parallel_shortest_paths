@@ -156,8 +156,12 @@ int main(int argc, char *argv[])
     /*
     Test RMAT
     */
-    Graph g(1000000);
-    g = parseRMAT(1000000, "rmat_large.txt");
+    // Graph g(100);
+    // g = parseRMAT(100, "rmat_small.txt");
+    // Graph g(10000);
+    // g = parseRMAT(10000, "rmat_medium.txt");
+    // Graph g(1000000);
+    // g = parseRMAT(1000000, "rmat_large.txt");
 
 
 
