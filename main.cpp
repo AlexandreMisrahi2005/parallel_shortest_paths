@@ -167,9 +167,8 @@ int main(int argc, char *argv[])
     g = parseRMAT(1000000, "rmat_large.txt");
 
 
-
-    std::vector<double> dist_seq(1000000);
-    std::vector<double> dist_par(1000000);
+    std::vector<double> dist_seq;
+    std::vector<double> dist_par;
     std::vector<double> dist_dij;
 
     // Find the shortest paths from vertex 0
@@ -184,7 +183,7 @@ int main(int argc, char *argv[])
             DELTA = std::stod(argv[2]);
         }
         int b = 1 + std::ceil(p.second / DELTA);
-        b = 50000;
+        b = 500000;
 
         // Start the timer
         auto start = std::chrono::high_resolution_clock::now();
