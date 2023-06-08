@@ -99,51 +99,51 @@ int main(int argc, char *argv[])
     0 6 4 3 11 10 5 7 14 18 11 10 8 10 18
     */
 
-    Graph g(15);
-    g.add_edge(0, 1, 6);
-    g.add_edge(0, 2, 4);
-    g.add_edge(0, 3, 3);
-    g.add_edge(1, 0, 6);
-    g.add_edge(1, 4, 5);
-    g.add_edge(1, 5, 9);
-    g.add_edge(2, 0, 4);
-    g.add_edge(2, 5, 6);
-    g.add_edge(2, 6, 8);
-    g.add_edge(3, 0, 3);
-    g.add_edge(3, 6, 2);
-    g.add_edge(3, 7, 4);
-    g.add_edge(4, 1, 5);
-    g.add_edge(4, 8, 3);
-    g.add_edge(4, 9, 7);
-    g.add_edge(5, 1, 9);
-    g.add_edge(5, 2, 6);
-    g.add_edge(5, 10, 5);
-    g.add_edge(6, 2, 8);
-    g.add_edge(6, 3, 2);
-    g.add_edge(6, 11, 6);
-    g.add_edge(7, 3, 4);
-    g.add_edge(7, 11, 3);
-    g.add_edge(7, 12, 1);
-    g.add_edge(8, 4, 3);
-    g.add_edge(8, 9, 6);
-    g.add_edge(8, 13, 9);
-    g.add_edge(9, 4, 7);
-    g.add_edge(9, 8, 6);
-    g.add_edge(9, 14, 2);
-    g.add_edge(10, 5, 5);
-    g.add_edge(10, 11, 4);
-    g.add_edge(10, 12, 3);
-    g.add_edge(11, 6, 6);
-    g.add_edge(11, 7, 3);
-    g.add_edge(11, 10, 4);
-    g.add_edge(12, 7, 1);
-    g.add_edge(12, 10, 3);
-    g.add_edge(12, 13, 2);
-    g.add_edge(13, 8, 9);
-    g.add_edge(13, 12, 2);
-    g.add_edge(13, 14, 8);
-    g.add_edge(14, 9, 2);
-    g.add_edge(14, 13, 8);
+    // Graph g(15);
+    // g.add_edge(0, 1, 6);
+    // g.add_edge(0, 2, 4);
+    // g.add_edge(0, 3, 3);
+    // g.add_edge(1, 0, 6);
+    // g.add_edge(1, 4, 5);
+    // g.add_edge(1, 5, 9);
+    // g.add_edge(2, 0, 4);
+    // g.add_edge(2, 5, 6);
+    // g.add_edge(2, 6, 8);
+    // g.add_edge(3, 0, 3);
+    // g.add_edge(3, 6, 2);
+    // g.add_edge(3, 7, 4);
+    // g.add_edge(4, 1, 5);
+    // g.add_edge(4, 8, 3);
+    // g.add_edge(4, 9, 7);
+    // g.add_edge(5, 1, 9);
+    // g.add_edge(5, 2, 6);
+    // g.add_edge(5, 10, 5);
+    // g.add_edge(6, 2, 8);
+    // g.add_edge(6, 3, 2);
+    // g.add_edge(6, 11, 6);
+    // g.add_edge(7, 3, 4);
+    // g.add_edge(7, 11, 3);
+    // g.add_edge(7, 12, 1);
+    // g.add_edge(8, 4, 3);
+    // g.add_edge(8, 9, 6);
+    // g.add_edge(8, 13, 9);
+    // g.add_edge(9, 4, 7);
+    // g.add_edge(9, 8, 6);
+    // g.add_edge(9, 14, 2);
+    // g.add_edge(10, 5, 5);
+    // g.add_edge(10, 11, 4);
+    // g.add_edge(10, 12, 3);
+    // g.add_edge(11, 6, 6);
+    // g.add_edge(11, 7, 3);
+    // g.add_edge(11, 10, 4);
+    // g.add_edge(12, 7, 1);
+    // g.add_edge(12, 10, 3);
+    // g.add_edge(12, 13, 2);
+    // g.add_edge(13, 8, 9);
+    // g.add_edge(13, 12, 2);
+    // g.add_edge(13, 14, 8);
+    // g.add_edge(14, 9, 2);
+    // g.add_edge(14, 13, 8);
 
 
     /*
@@ -158,11 +158,10 @@ int main(int argc, char *argv[])
     */
     // Graph g(100);
     // g = parseRMAT(100, "rmat_small.txt");
-    // Graph g(10000);
-    // g = parseRMAT(10000, "rmat_medium.txt");
+    Graph g(10000);
+    g = parseRMAT(10000, "rmat_medium.txt");
     // Graph g(1000000);
     // g = parseRMAT(1000000, "rmat_large.txt");
-
 
 
     std::vector<double> dist_seq;
@@ -181,12 +180,12 @@ int main(int argc, char *argv[])
             DELTA = std::stod(argv[2]);
         }
         int b = 1 + std::ceil(p.second / DELTA);
-        b = 50;
+        b = 5000;
 
         // Start the timer
         auto start = std::chrono::high_resolution_clock::now();
 
-        dist_seq = seqDeltaStepping(g, 0, DELTA, 50);
+        dist_seq = seqDeltaStepping(g, 0, DELTA, b);
         
         // End the timer
         auto end = std::chrono::high_resolution_clock::now();
@@ -196,7 +195,7 @@ int main(int argc, char *argv[])
         // Start the timer
         start = std::chrono::high_resolution_clock::now();
 
-        dist_par = parDeltaStepping(g, 0, DELTA, 50);  // graph, source node, delta, b (number of buckets)
+        dist_par = parDeltaStepping(g, 0, DELTA, b);  // graph, source node, delta, b (number of buckets)
         
         // End the timer
         end = std::chrono::high_resolution_clock::now();
@@ -213,17 +212,17 @@ int main(int argc, char *argv[])
     }
 
     // print the shortest paths
-    std::cout << "Sequential operation" << std::endl;
-    std::cout << "Vertex\tDistance from Source" << std::endl;
-    for (int i = 0; i < g.size(); ++i) {
-        std::cout << i << "\t" << dist_seq[i] << std::endl;
-    }
+    // std::cout << "Sequential operation" << std::endl;
+    // std::cout << "Vertex\tDistance from Source" << std::endl;
+    // for (int i = 0; i < g.size(); ++i) {
+    //     std::cout << i << "\t" << dist_seq[i] << std::endl;
+    // }
 
-    std::cout << "Parallel operation" << std::endl;
-    std::cout << "Vertex\tDistance from Source" << std::endl;
-    for (int i = 0; i < g.size(); ++i) {
-        std::cout << i << "\t" << dist_par[i] << std::endl;
-    }
+    // std::cout << "Parallel operation" << std::endl;
+    // std::cout << "Vertex\tDistance from Source" << std::endl;
+    // for (int i = 0; i < g.size(); ++i) {
+    //     std::cout << i << "\t" << dist_par[i] << std::endl;
+    // }
 
     // std::ofstream outFile("output_sssp.txt");
     // for (const auto &e : dist) outFile << e << "\n";
