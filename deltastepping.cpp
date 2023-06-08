@@ -164,7 +164,6 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
 
             B[k] = std::priority_queue<int>();
 
-            std::vector<std::vector<Pii>> SubRL;
 
             int threads = THREAD_NUM;
             if (threads > R_l.size())
@@ -189,7 +188,6 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
                     R.push_back(R_l[j]);
                 }
                 workersL.push_back(std::thread(&relaxRequestsPar, R, std::ref(tentMutex), std::ref(tent), std::ref(B)));
-                SubRL.push_back(R);
             }
 
             std::vector<Pii> R;
@@ -198,7 +196,6 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
                 R.push_back(R_l[i]);
             }
             relaxRequestsPar(R, tentMutex, tent, B);
-            SubRL.push_back(R);
 
             for (int i = 0; i < threads - 1; i++)
             {
@@ -216,19 +213,8 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
             };
 
             R_l.clear();
-            for (int it = 0; it < SubRL.size(); it++)
-            {
-                if (SubRL[it].size() > 0)
-                {
-                    for (int i = 0; i < SubRL.size(); i++)
-                    {
-                        R_l.push_back(SubRL[it][i]);
-                    }
-                }
-            };
 
             relaxRequestsPar(R_h, tentMutex, tent, B);
-            std::vector<std::vector<Pii>> SubRH;
             threads = THREAD_NUM;
             if (threads > R_h.size())
             {
@@ -250,7 +236,6 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
                     Rh.push_back(R_h[j]);
                 }
                 workersH.push_back(std::thread(&relaxRequestsPar, Rh, std::ref(tentMutex), std::ref(tent), std::ref(B)));
-                SubRH.push_back(Rh);
             }
             std::vector<Pii> Rh;
             for (int i = blockstart; i < R_h.size(); i++)
@@ -258,7 +243,6 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
                 Rh.push_back(R_h[i]);
             }
             relaxRequestsPar(Rh, tentMutex, tent, B);
-            SubRH.push_back(Rh);
 
             for (int i = 0; i < threads - 1; i++)
             {
@@ -276,16 +260,6 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
             };
 
             R_h.clear();
-            for (int it = 0; it < SubRH.size(); it++)
-            {
-                if (SubRH[it].size() > 0)
-                {
-                    for (int i = 0; i < SubRH.size(); i++)
-                    {
-                        R_h.push_back(SubRH[it][i]);
-                    }
-                }
-            };
         };
 
         int i = 0;
