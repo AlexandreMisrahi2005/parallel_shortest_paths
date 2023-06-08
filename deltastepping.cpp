@@ -1,6 +1,7 @@
 #include <queue>
 #include <limits>
 #include <thread>
+#include <mutex>
 
 #include "graph.h"
 
@@ -64,6 +65,16 @@ void relaxRequests(std::vector<Pii> requests, std::vector<double> &tent, std::ve
     }
 }
 
+void relaxRequestsPar(std::vector<Pii> requests, std::mutex &tentMutex, std::vector<double> &tent, std::vector<std::priority_queue<int>> &B)
+{
+    tentMutex.lock();
+    for (int i = 0; i < requests.size(); ++i)
+    {
+        relax(requests[i].first, requests[i].second, tent, B);
+    }
+    tentMutex.unlock();
+}
+
 /*
  * adj_list: adjacency matrix of the graph
  * source: source, 0 ≤ s < N
@@ -120,7 +131,7 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
     DELTA = _DELTA;
     b = _b;
 
-    int THREAD_NUM = 3;
+    int THREAD_NUM = 15;
 
     std::vector<std::priority_queue<int>> B(b); // b buckets (vectors) stored in B, priority queues
     std::vector<double> tent(N);                   // tentative distances
@@ -138,6 +149,7 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
     std::vector<Pii> R_h;
     std::vector<Pii> R_l;
 
+    std::mutex tentMutex; // Mutex for protecting access to the "tent" vector
 
     int k = 0;
     while (k < b)
@@ -146,7 +158,7 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
         {
             std::vector<std::thread> workersL;
             std::vector<std::thread> workersH;
-            
+
             findRequests(R_l, B[k], true, adj_list, tent);
             findRequests(R_h, B[k], false, adj_list, tent);
 
@@ -176,7 +188,7 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
                 {
                     R.push_back(R_l[j]);
                 }
-                workersL.push_back(std::thread(&relaxRequests, R, std::ref(tent), std::ref(B)));
+                workersL.push_back(std::thread(&relaxRequestsPar, R, std::ref(tentMutex), std::ref(tent), std::ref(B)));
                 SubRL.push_back(R);
             }
 
@@ -185,7 +197,7 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
             {
                 R.push_back(R_l[i]);
             }
-            relaxRequests(R, tent, B);
+            relaxRequestsPar(R, tentMutex, tent, B);
             SubRL.push_back(R);
 
             for (int i = 0; i < threads - 1; i++)
@@ -194,7 +206,6 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
                 {
                     if (workersL[i].joinable())
                     {
-                        // std::cout << "Joining workersL[" << i << "]" << std::endl;
                         workersL[i].join();
                     }
                 }
@@ -216,7 +227,7 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
                 }
             };
 
-            relaxRequests(R_h, tent, B);
+            relaxRequestsPar(R_h, tentMutex, tent, B);
             std::vector<std::vector<Pii>> SubRH;
             threads = THREAD_NUM;
             if (threads > R_h.size())
@@ -238,7 +249,7 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
                 {
                     Rh.push_back(R_h[j]);
                 }
-                workersH.push_back(std::thread(&relaxRequests, Rh, std::ref(tent), std::ref(B)));
+                workersH.push_back(std::thread(&relaxRequestsPar, Rh, std::ref(tentMutex), std::ref(tent), std::ref(B)));
                 SubRH.push_back(Rh);
             }
             std::vector<Pii> Rh;
@@ -246,7 +257,7 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
             {
                 Rh.push_back(R_h[i]);
             }
-            relaxRequests(Rh, tent, B);
+            relaxRequestsPar(Rh, tentMutex, tent, B);
             SubRH.push_back(Rh);
 
             for (int i = 0; i < threads - 1; i++)
@@ -254,8 +265,7 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
                 try
                 {
                     if (workersH[i].joinable())
-                    {   
-                        // std::cout << "Joining workersH[" << i << "]" << std::endl;
+                    {
                         workersH[i].join();
                     }
                 }

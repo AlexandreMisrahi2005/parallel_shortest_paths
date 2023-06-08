@@ -161,17 +161,12 @@ int main(int argc, char *argv[])
     */
     // Graph g(100);
     // g = parseRMAT(100, "rmat_small.txt");
-    Graph g(10000);
-    g = parseRMAT(10000, "rmat_medium.txt");
-    // Graph g(1000000);
-    // g = parseRMAT(1000000, "rmat_large.txt");
+    // Graph g(10000);
+    // g = parseRMAT(10000, "rmat_medium.txt");
+    Graph g(1000000);
+    g = parseRMAT(1000000, "rmat_large.txt");
 
 
-<<<<<<< HEAD
-=======
-    std::vector<double> dist;
-
->>>>>>> refs/remotes/origin/main
     std::vector<double> dist_seq;
     std::vector<double> dist_par;
     std::vector<double> dist_dij;
@@ -188,7 +183,7 @@ int main(int argc, char *argv[])
             DELTA = std::stod(argv[2]);
         }
         int b = 1 + std::ceil(p.second / DELTA);
-        b = 5000;
+        b = 500000;
 
         // Start the timer
         auto start = std::chrono::high_resolution_clock::now();
