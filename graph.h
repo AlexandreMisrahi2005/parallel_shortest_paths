@@ -21,7 +21,7 @@ public:
     void add_edge(int u, int v, double weight)
     {
         adj_list[u].push_back(std::make_pair(v, weight));
-        adj_list[v].push_back(std::make_pair(u, weight));
+        // adj_list[v].push_back(std::make_pair(u, weight));  // uncomment to make graph undirected
     }
 
     int size() const

@@ -81,11 +81,6 @@ std::vector<double> seqDeltaStepping(const Graph &graph, int source, double _DEL
     std::vector<double> tent(N, INF);                   // tentative distances
     std::vector<std::vector<Pii>> adj_list = graph.get_adj_list();
 
-    // for (int i = 0; i < N; ++i)
-    // {
-    //     tent[i] = INF;
-    // }
-
     tent[source] = 0;
     B[0].push(source);
     int i = b;
@@ -121,16 +116,11 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
     DELTA = _DELTA;
     b = _b;
 
-    int THREAD_NUM = 3;
+    int THREAD_NUM = 1;
 
     std::vector<std::priority_queue<int>> B(b); // b buckets (vectors) stored in B, priority queues
-    std::vector<double> tent(N);                   // tentative distances
+    std::vector<double> tent(N, INF);                   // tentative distances
     std::vector<std::vector<Pii>> adj_list = graph.get_adj_list();
-
-    for (int i = 0; i < N; ++i)
-    {
-        tent[i] = INF;
-    }
 
     B[0].push(source);
     tent[source] = 0;
@@ -138,7 +128,6 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
     // define heavy and light requests
     std::vector<Pii> R_h;
     std::vector<Pii> R_l;
-
 
     int k = 0;
     while (k < b)
