@@ -5,8 +5,12 @@
  
  EXAMPLE: To run a test on graph *g1* that contains 6 nodes, using the deltastepping algorithm with parameter $\Delta=2$ and 5 threads: `./sssp 6 graphs/g1.txt deltastepping 2 5`. If the output looks like 
 ```
-Sequential operation took 295179 µs.
-Parallel operation took 37937 µs.
+Input graph has 6 nodes and 8 edges
+Using parameter Δ = 2
+Using 28 buckets
+Sequential operation took 90 µs.
+Using NUM_THREADS = 5
+Parallel operation took 78 µs.
 Sequential operation
 Vertex  Distance from Source
 0       0
