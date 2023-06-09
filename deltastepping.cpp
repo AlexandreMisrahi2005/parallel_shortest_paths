@@ -120,13 +120,13 @@ std::vector<double> seqDeltaStepping(const Graph &graph, int source, double _DEL
     return tent;
 }
 
-std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA, int _b)
+std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA, int _b, int NUM_THREADS)
 {
     N = graph.size();
     DELTA = _DELTA;
     b = _b;
 
-    int THREAD_NUM = 15;
+    int THREAD_NUM = NUM_THREADS;
 
     std::vector<std::priority_queue<int>> B(b); // b buckets (vectors) stored in B, priority queues
     std::vector<double> tent(N, INF);                   // tentative distances

@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
 
     if (argc < 2)
     {
-        std::cout << "Usage: " << argv[0] 
+        std::cout << "Usage: " << argv[0]
                   << " \n<N: number of nodes in input graph> "
                   << " \n<path to input graph file: each line should be a triple u, v, w where u, v are node ids and w is the weight of the edge (u,v). If path is 'random', a random graph with N nodes is generated (the number of edges can be modified in main.cpp). If path is 'grid', a random grid of size n is generated with edges between each node with a probability> "
                   << " \n<algorithm to use: [dijkstra, deltastepping]> "
@@ -174,18 +174,20 @@ int main(int argc, char *argv[])
     std::vector<double> dist_dij;
 
     // Find the shortest paths from vertex 0
+    std::cout << "Input graph has " << N << " nodes and " << g.size_edges() << " edges" << std::endl;
     if (algo == "deltastepping")
     {
         std::vector<std::vector<Pii>> adjMat = g.get_adj_list();
-        std::cout << adjMat.size() << std::endl;
         Pii p = smallestAndLongestEdges(adjMat, g.size());
-        double DELTA = p.first;
+        double DELTA = p.second;
         if (argc == 5)
         {
             DELTA = std::stod(argv[4]);
         }
-        int b = 1 + std::ceil(p.second / DELTA);
-        b = 500000;
+        std::cout << "Using parameter Δ = " << DELTA << std::endl;
+        int b = std::ceil(p.second * g.size_edges() / DELTA);
+        std::cout << "Using " << b << " buckets" << std::endl;
+        // b = 500000;
 
         // Start the timer
         auto start = std::chrono::high_resolution_clock::now();
@@ -197,10 +199,16 @@ int main(int argc, char *argv[])
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
         std::cout << "Sequential operation took " << duration << " µs." << std::endl;
 
+        int NUM_THREADS = 1;
+        std::cout << "Using NUM_THREADS = " << NUM_THREADS << std::endl;
+        if (argc == 6)
+        {
+            NUM_THREADS = std::stoi(argv[5]);
+        }
         // Start the timer
         start = std::chrono::high_resolution_clock::now();
 
-        dist_par = parDeltaStepping(g, 0, DELTA, b);  // graph, source node, delta, b (number of buckets)
+        dist_par = parDeltaStepping(g, 0, DELTA, b, NUM_THREADS);  // graph, source node, delta, b (number of buckets)
         
         // End the timer
         end = std::chrono::high_resolution_clock::now();
@@ -222,18 +230,28 @@ int main(int argc, char *argv[])
                 std::cout << i << "\t" << dist_par[i] << std::endl;
             }
         }
+        std::ofstream outFile("output_deltastepping.txt");
+        for (const auto &e : dist_dij) outFile << e << "\n";
     } 
     else if (algo == "dijkstra") {
-        dist_dij = dijkstra(g, 0);
-        std::cout << "Dijkstra" << std::endl;
-        std::cout << "Vertex\tDistance from Source" << std::endl;
-        for (int i = 0; i < g.size(); ++i) {
-            std::cout << i << "\t" << dist_dij[i] << std::endl;
-        }
-    }
+        // Start the timer
+        auto start_dij = std::chrono::high_resolution_clock::now();
 
-    std::ofstream outFile("output_dijkstra.txt");
-    for (const auto &e : dist_dij) outFile << e << "\n";
+        dist_dij = dijkstra(g, 0);
+        
+        // End the timer
+        auto end_dij = std::chrono::high_resolution_clock::now();
+        auto duration_dij = std::chrono::duration_cast<std::chrono::microseconds>(end_dij - start_dij).count();
+        std::cout << "Dijkstra Algo took " << duration_dij << " µs." << std::endl;
+        if(N < 20){
+            std::cout << "Vertex\tDistance from Source" << std::endl;
+            for (int i = 0; i < g.size(); ++i) {
+                std::cout << i << "\t" << dist_dij[i] << std::endl;
+            }
+        }
+        std::ofstream outFile("output_dijkstra.txt");
+        for (const auto &e : dist_dij) outFile << e << "\n";
+    }
 
     return 0;
 }

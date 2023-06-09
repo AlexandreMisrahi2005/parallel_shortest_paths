@@ -23,5 +23,5 @@ def add_weight_to_lines(file_name):
     except Exception as e:
         print(f'An error occurred: {e}')
 
-file_name = "rmat_small.txt"
+file_name = "graphs/rmat_medium.txt"
 add_weight_to_lines(file_name)

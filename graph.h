@@ -9,6 +9,7 @@ typedef std::pair<int, double> Pii; // (vertex, weight)
 class Graph
 {
     int vertices;                           // number of vertices
+    int edges = 0;                          // number of edges
     std::vector<std::vector<Pii>> adj_list; // adjacency list
 
 public:
@@ -22,11 +23,16 @@ public:
     {
         adj_list[u].push_back(std::make_pair(v, weight));
         // adj_list[v].push_back(std::make_pair(u, weight));  // uncomment to make graph undirected
+        edges++;
     }
 
     int size() const
     {
         return vertices;
+    }
+    int size_edges() const
+    {
+        return edges;
     }
     std::vector<std::vector<Pii>> get_adj_list() const
     {
