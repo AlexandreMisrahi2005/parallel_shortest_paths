@@ -10,7 +10,7 @@ class Graph
 {
     int vertices;                           // number of vertices
     int edges = 0;                          // number of edges
-    std::vector<std::vector<Pii>> adj_list; // adjacency list
+    std::vector<std::vector<Pii> > adj_list; // adjacency list
 
 public:
     Graph(int n) : vertices(n)
@@ -34,7 +34,7 @@ public:
     {
         return edges;
     }
-    std::vector<std::vector<Pii>> get_adj_list() const
+    std::vector<std::vector<Pii> > get_adj_list() const
     {
         return adj_list;
     }

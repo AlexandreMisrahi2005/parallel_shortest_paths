@@ -12,13 +12,9 @@ std::vector<double> dijkstra(const Graph &graph, int source)
         throw std::invalid_argument("Invalid source vertex");
 
     std::vector<double> dist(n, std::numeric_limits<double>::max());
-    std::vector<std::vector<Pii>> adj_list = graph.get_adj_list();
+    std::vector<std::vector<Pii> > adj_list = graph.get_adj_list();
 
     std::priority_queue<Pii> Q; // Priority queue of vertices
-
-    for (int i=1; i<n; i++) {
-        Q.push(std::make_pair(dist[i], i));
-    }
 
     Q.push(std::make_pair(0, source));
     dist[source] = 0;

@@ -11,7 +11,7 @@ int DELTA;                                          // parameter of Delta-Steppi
 int b;                                              // number of buckets
 int N;                                              // number of vertices
 
-bool isNotEmpty(std::vector<std::priority_queue<int>> bucket_vec)
+bool isNotEmpty(std::vector<std::priority_queue<int> > bucket_vec)
 {
     for (size_t i = 0; i < bucket_vec.size(); ++i)
     {
@@ -23,21 +23,20 @@ bool isNotEmpty(std::vector<std::priority_queue<int>> bucket_vec)
     return false;
 }
 
-void relax(int w, int x, std::vector<double> &tent, std::vector<std::priority_queue<int>> &B)
+void relax(int w, int x, std::vector<double> &tent, std::vector<std::priority_queue<int> > &B)
 {
     if (x < tent[w])
     {
         if (tent[w] != INF)
         {
-
-            B[(tent[w] / DELTA)].pop(); // remove from old bucket
+            B[std::floor(tent[w] / DELTA)].pop(); // remove from old bucket
         }
-        B[(x / DELTA)].push(w); // insert in new bucket
+        B[std::floor(x / DELTA)].push(w); // insert in new bucket
         tent[w] = x;
     }
 }
 
-void findRequests(std::vector<Pii> &requests, std::priority_queue<int> bucket, bool light_edge, std::vector<std::vector<Pii>> adj_list, std::vector<double> tent)
+void findRequests(std::vector<Pii> &requests, std::priority_queue<int> bucket, bool light_edge, std::vector<std::vector<Pii> > adj_list, std::vector<double> tent)
 {
     while (!bucket.empty())
     {
@@ -57,7 +56,7 @@ void findRequests(std::vector<Pii> &requests, std::priority_queue<int> bucket, b
     }
 }
 
-void relaxRequests(std::vector<Pii> requests, std::vector<double> &tent, std::vector<std::priority_queue<int>> &B)
+void relaxRequests(std::vector<Pii> requests, std::vector<double> &tent, std::vector<std::priority_queue<int> > &B)
 {
     for (int i = 0; i < requests.size(); ++i)
     {
@@ -65,7 +64,7 @@ void relaxRequests(std::vector<Pii> requests, std::vector<double> &tent, std::ve
     }
 }
 
-void relaxRequestsPar(std::vector<Pii> requests, std::mutex &tentMutex, std::vector<double> &tent, std::vector<std::priority_queue<int>> &B)
+void relaxRequestsPar(std::vector<Pii> requests, std::mutex &tentMutex, std::vector<double> &tent, std::vector<std::priority_queue<int> > &B)
 {
     tentMutex.lock();
     for (int i = 0; i < requests.size(); ++i)
@@ -87,9 +86,9 @@ std::vector<double> seqDeltaStepping(const Graph &graph, int source, double _DEL
     DELTA = _DELTA;
     b = _b;
 
-    std::vector<std::priority_queue<int>> B(b); // b buckets (vectors) stored in B, priority queues
+    std::vector<std::priority_queue<int> > B(b); // b buckets (vectors) stored in B, priority queues
     std::vector<double> tent(N, INF);                   // tentative distances
-    std::vector<std::vector<Pii>> adj_list = graph.get_adj_list();
+    std::vector<std::vector<Pii> > adj_list = graph.get_adj_list();
 
     tent[source] = 0;
     B[0].push(source);
@@ -128,9 +127,9 @@ std::vector<double> parDeltaStepping(const Graph &graph, int source, int _DELTA,
 
     int THREAD_NUM = NUM_THREADS;
 
-    std::vector<std::priority_queue<int>> B(b); // b buckets (vectors) stored in B, priority queues
+    std::vector<std::priority_queue<int> > B(b); // b buckets (vectors) stored in B, priority queues
     std::vector<double> tent(N, INF);                   // tentative distances
-    std::vector<std::vector<Pii>> adj_list = graph.get_adj_list();
+    std::vector<std::vector<Pii> > adj_list = graph.get_adj_list();
 
     B[0].push(source);
     tent[source] = 0;

@@ -6,7 +6,7 @@
 #include "deltastepping.cpp"
 #include "dijkstra.cpp"
 
-Pii smallestAndLongestEdges(std::vector<std::vector<Pii>> adjMat, int N)
+Pii smallestAndLongestEdges(std::vector<std::vector<Pii> > adjMat, int N)
 {
     int min = INF;
     int max = -INF;
@@ -177,34 +177,34 @@ int main(int argc, char *argv[])
     std::cout << "Input graph has " << N << " nodes and " << g.size_edges() << " edges" << std::endl;
     if (algo == "deltastepping")
     {
-        std::vector<std::vector<Pii>> adjMat = g.get_adj_list();
+        std::vector<std::vector<Pii> > adjMat = g.get_adj_list();
         Pii p = smallestAndLongestEdges(adjMat, g.size());
         double DELTA = p.second;
-        if (argc == 5)
+        if (argc >= 5)
         {
             DELTA = std::stod(argv[4]);
         }
         std::cout << "Using parameter Δ = " << DELTA << std::endl;
         int b = std::ceil(p.second * g.size_edges() / DELTA);
-        std::cout << "Using " << b << " buckets" << std::endl;
         // b = 500000;
+        std::cout << "Using " << b << " buckets" << std::endl;
 
         // Start the timer
         auto start = std::chrono::high_resolution_clock::now();
 
         dist_seq = seqDeltaStepping(g, 0, DELTA, b);
-        
+
         // End the timer
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
         std::cout << "Sequential operation took " << duration << " µs." << std::endl;
 
         int NUM_THREADS = 1;
-        std::cout << "Using NUM_THREADS = " << NUM_THREADS << std::endl;
         if (argc == 6)
         {
             NUM_THREADS = std::stoi(argv[5]);
         }
+        std::cout << "Using NUM_THREADS = " << NUM_THREADS << std::endl;
         // Start the timer
         start = std::chrono::high_resolution_clock::now();
 
@@ -231,7 +231,7 @@ int main(int argc, char *argv[])
             }
         }
         std::ofstream outFile("output_deltastepping.txt");
-        for (const auto &e : dist_dij) outFile << e << "\n";
+        for (const auto &e : dist_seq) outFile << e << "\n";
     } 
     else if (algo == "dijkstra") {
         // Start the timer
