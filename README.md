@@ -3,7 +3,7 @@
  
  To run the project: in the `parallel_shortest_paths` folder run `make`. This creates a run file called `sssp` (single-source shortest paths).
  
- To run a test example on graph *g1* that contains 6 nodes, using the deltastepping algorithm with parameter $\Delta=2$: `./sssp 6 graphs/g1.txt deltastepping 2`. If the output looks like 
+ EXAMPLE: To run a test on graph *g1* that contains 6 nodes, using the deltastepping algorithm with parameter $\Delta=2$: `./sssp 6 graphs/g1.txt deltastepping 2`. If the output looks like 
 ```
 Sequential operation took 295179 µs.
 Parallel operation took 37937 µs.
