@@ -12,22 +12,21 @@ std::vector<double> dijkstra(const Graph &graph, int source)
         throw std::invalid_argument("Invalid source vertex");
 
     std::vector<double> dist(n, std::numeric_limits<double>::max());
-    std::vector<bool> visited(n, false);
     std::vector<std::vector<Pii>> adj_list = graph.get_adj_list();
-    std::queue<Pii> Q; // Queue of vertices
+
+    std::priority_queue<Pii> Q; // Priority queue of vertices
+
+    for (int i=1; i<n; i++) {
+        Q.push(std::make_pair(dist[i], i));
+    }
 
     Q.push(std::make_pair(0, source));
     dist[source] = 0;
 
     while (!Q.empty())
     {
-        int u = Q.front().second;
+        int u = Q.top().second;
         Q.pop();
-
-        if (visited[u])
-            continue;
-
-        visited[u] = true;
 
         // iterate through all the neighbor vertices of u
         for (auto edge : adj_list[u])
@@ -35,10 +34,9 @@ std::vector<double> dijkstra(const Graph &graph, int source)
             int v = edge.first;
             double weight = edge.second;
 
-            // v must not be visited and the distance to v through u must be less than the current distance
+            // the distance to v through u must be less than the current distance
             int alt = dist[u] + weight;
-            if (alt < dist[v])
-            { // !visited[v] &&
+            if (alt < dist[v]) {
                 dist[v] = alt;
                 Q.push(std::make_pair(dist[v], v));
             }
