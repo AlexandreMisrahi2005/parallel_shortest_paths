@@ -11,20 +11,20 @@ std::vector<double> dijkstra(const Graph &graph, int source)
     if (source < 0 || source >= n)
         throw std::invalid_argument("Invalid source vertex");
 
-    std::vector<double> dist(n, std::numeric_limits<double>::max());
-    std::vector<std::vector<Pii> > adj_list = graph.get_adj_list();
+    std::vector<double> dist(n, std::numeric_limits<double>::max()); // unknown distance from source to u
+    std::vector<std::vector<Pii>> adj_list = graph.get_adj_list();
 
     std::priority_queue<Pii> Q; // Priority queue of vertices
 
     Q.push(std::make_pair(0, source));
-    dist[source] = 0;
+    dist[source] = 0;       // Initialization
 
-    while (!Q.empty())
+    while (!Q.empty()) // The main loop
     {
         int u = Q.top().second;
-        Q.pop();
+        Q.pop();                // Remove and return best vertex
 
-        // iterate through all the neighbor vertices of u
+        // iterate through all v neighbor vertices of u
         for (auto edge : adj_list[u])
         {
             int v = edge.first;
